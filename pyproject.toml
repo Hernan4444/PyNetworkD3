@@ -1,7 +1,7 @@
 [tool.poetry]
 name = "PyNetworkD3"
-version = "1.0.0"
-description = "Create d3 visualization with python"
+version = "1.0.1"
+description = "Create D3 visualization networks with Python"
 license = "MIT"
 authors = ["Hernán Valdivieso <hfvaldivieso@uc.cl>"]
 maintainers = ["Hernán Valdivieso <hfvaldivieso@uc.cl>"]
