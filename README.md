@@ -2,7 +2,7 @@
 
 <p align="center">
     <em>
-        Create d3 visualization with python
+        Create D3 visualization networks with Python
     </em>
 </p>
 
