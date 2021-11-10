@@ -9,6 +9,10 @@
 <p align="center">
 <a target="_blank" href="https://colab.research.google.com/drive/1AwtW-FDAaTh_RMBKj4CJYcyKP2xnOanK?usp=sharing"><img src="https://img.shields.io/badge/example-Open%20in%20colab-hsl(30%2C%20100%25%2C%2048%25)?logo=googlecolab" /></a>
 
+<a href="https://pypi.org/project/pynetworkd3/" target="_blank">
+    <img src="https://img.shields.io/pypi/v/pynetworkd3?label=version&logo=python&logoColor=%23fff&color=306b9c" alt="PyPI - Version">
+</a>
+
 <a href="https://github.com/hernan4444/pynetworkd3/actions?query=workflow%3Atests" target="_blank">
     <img src="https://img.shields.io/github/workflow/status/hernan4444/pynetworkd3/tests?label=tests&logo=python&logoColor=%23fff" alt="Tests">
 </a>
@@ -18,9 +22,6 @@
 
 
 <!-- 
-<a href="https://pypi.org/project/pynetworkd3/" target="_blank">
-    <img src="https://img.shields.io/pypi/v/pynetworkd3?label=version&logo=python&logoColor=%23fff&color=306998" alt="PyPI - Version">
-</a>
 
 
 <a href="https://codecov.io/gh/daleal/iic2343" target="_blank">
