@@ -84,3 +84,21 @@ class Graph(Base):
     @radio.setter
     def radio(self, value):
         self.__attributes["radio"] = value
+
+
+class ArcDiagram(Base):
+    def __init__(self, data, width, height, radio=20, tooltip="null"):
+        super().__init__(data, width, height, "arc diagram")
+        self.__attributes = {"tooltip": tooltip, "radio": radio}
+
+    def get_html(self):
+        html = super().get_html()
+        return Template(html).safe_substitute(**self.__attributes)
+
+    @property
+    def radio(self):
+        return self.__attributes["radio"]
+
+    @radio.setter
+    def radio(self, value):
+        self.__attributes["radio"] = value

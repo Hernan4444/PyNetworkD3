@@ -1,13 +1,11 @@
 circle {
     fill: #FD8D3C;
-    stroke: white;
-    stroke-width: 4px;
     cursor:move;
 }
 
 line {
     stroke: #9ECAE1;
-    stroke-width: 4px;
+    stroke-width: 2px;
 }
 
 text {
@@ -20,8 +18,7 @@ text {
 
 div.tooltip {	
     position: absolute;			
-    text-align: center;			
-							
+    text-align: center;				
     padding: 2px;				
     font: 12px sans-serif;		
     background: lightsteelblue;	

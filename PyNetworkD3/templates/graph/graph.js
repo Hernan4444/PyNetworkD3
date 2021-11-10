@@ -29,8 +29,8 @@ const tooltip = d3
 const simulation = d3
     .forceSimulation()
     .force("center", d3.forceCenter(widthSVG / 2, heightSVG / 2))
-    .force("collision", d3.forceCollide(80))
-    .force("charge", d3.forceManyBody().strength(-600))
+    .force("collision", d3.forceCollide(30))
+    .force("charge", d3.forceManyBody().strength(-50))
     .force("link", d3.forceLink().id(node => node.id));
 
 const ticked = () => {
