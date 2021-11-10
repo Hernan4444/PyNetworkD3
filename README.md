@@ -6,7 +6,9 @@
     </em>
 </p>
 
-<!-- <p align="center">
+<p align="center">
+<a href="https://colab.research.google.com/drive/1AwtW-FDAaTh_RMBKj4CJYcyKP2xnOanK?usp=sharing"><img src="https://img.shields.io/badge/example-Open%20in%20colab-hsl(30%2C%20100%25%2C%2048%25)?logo=googlecolab" /></a>
+<!-- 
 <a href="https://pypi.org/project/iic2343" target="_blank">
     <img src="https://img.shields.io/pypi/v/iic2343?label=version&logo=python&logoColor=%23fff&color=306998" alt="PyPI - Version">
 </a>
@@ -21,7 +23,8 @@
 
 <a href="https://github.com/daleal/iic2343/actions?query=workflow%3Alinters" target="_blank">
     <img src="https://img.shields.io/github/workflow/status/daleal/iic2343/linters?label=linters&logo=github" alt="Linters">
-</a>
+</a> 
+-->
 </p>
 
 ## Installation
@@ -29,26 +32,37 @@
 Install using `pip`!
 
 ```sh
-$ pip install iic2343
+$ pip install pynetworkd3
 ```
 
 ## Usage
 
-To use the library, import the `Basys3` object directly and use the `begin`, `write` and `end` methods!
+To use the library, import the `Graph` object directly and use the `export` method
+to create a `.html` with the visualization. 
+
 
 ```python
-from iic2343 import Basys3
+from PyNetworkD3 import Graph
 
-instance = Basys3()
+dataset = {
+    "nodes": [{"id": 1},{"id": 2},{"id": 3},{"id": 4},{"id": 5}],
+    "links": [
+        {"source": 1, "target": 3},
+        {"source": 2, "target": 3},
+        {"source": 1, "target": 3},
+        {"source": 5, "target": 3},
+        {"source": 4, "target": 1},
+    ]
+}
 
-instance.begin(port_number=2)  # port_number is optional
-instance.write(1, bytearray([0x00, 0x00, 0x10, 0x16, 0x01]))
-instance.write(2, bytearray([0x00, 0x00, 0x00, 0x18, 0x03]))
-instance.write(3, bytearray([0x00, 0x00, 0x20, 0x18, 0x03]))
-instance.write(4, bytearray([0x00, 0x00, 0x00, 0x20, 0x00]))
-instance.end()
+graph = Graph(dataset, width=300, height=200, radio=10, tooltip=["id"])
+
+graph.export("output.html)
 ```
 
+Also you can write the instance in the last line of the notebook's cell (view the <a href="https://colab.research.google.com/drive/1AwtW-FDAaTh_RMBKj4CJYcyKP2xnOanK?usp=sharing"> example in colab</a>) to view the visualization.
+
+<!-- 
 ### Methods
 
 Here, a `Basys3` instance has 3 methods:
