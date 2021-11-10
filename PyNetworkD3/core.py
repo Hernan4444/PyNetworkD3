@@ -3,6 +3,7 @@
 from os.path import join
 from string import Template
 from urllib.parse import quote as urllib_quote
+
 from .constants import TEMPLATE_PATH
 
 
@@ -14,9 +15,7 @@ class Base:
             self.chart_js = file.read()
 
         with open(join(TEMPLATE_PATH, chart, f"{chart}.css"), encoding="utf-8") as file:
-            self.style_css = "<style>\n{}\n</style>".format(
-                file.read()
-            )
+            self.style_css = "<style>\n{}\n</style>".format(file.read())
 
     def export(self, path):
         with open(path, "w", encoding="utf-8") as file:
@@ -51,19 +50,21 @@ class Base:
     def _repr_html_(self):
         html = urllib_quote(self.get_html())
         onload = (
-            'this.contentDocument.open();'
-            'this.contentDocument.write('
-            '    decodeURIComponent(this.getAttribute(\'data-html\'))'
-            ');'
-            'this.contentDocument.close();'
+            "this.contentDocument.open();"
+            "this.contentDocument.write("
+            "    decodeURIComponent(this.getAttribute('data-html'))"
+            ");"
+            "this.contentDocument.close();"
         )
         iframe = (
-                '<iframe src="about:blank" width="{width}" height="{height}"'
-                'style="border:none !important;" '
-                'data-html={html} onload="{onload}" '
-                '"allowfullscreen" "webkitallowfullscreen" "mozallowfullscreen">'
-                '</iframe>'
-            ).format(html=html, onload=onload, width=self.width + 50, height=self.height + 50)
+            '<iframe src="about:blank" width="{width}" height="{height}"'
+            'style="border:none !important;" '
+            'data-html={html} onload="{onload}" '
+            '"allowfullscreen" "webkitallowfullscreen" "mozallowfullscreen">'
+            "</iframe>"
+        ).format(
+            html=html, onload=onload, width=self.width + 50, height=self.height + 50
+        )
         return iframe
 
 
@@ -83,5 +84,3 @@ class Graph(Base):
     @radio.setter
     def radio(self, value):
         self.__attributes["radio"] = value
-
-    
