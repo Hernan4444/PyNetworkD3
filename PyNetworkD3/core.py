@@ -11,8 +11,9 @@ from .utils import bool_js
 class Base:
     def __init__(self, data, width, height, chart, view_box):
         self.data = data
-        self.__size = {"width": width, "height": height}
-        self.__main_attributes = {"view_box": bool_js(view_box)}
+        self.width = width
+        self.height = height
+        self.view_box = bool_js(view_box)
         with open(join(TEMPLATE_PATH, "main.js"), encoding="utf-8") as file:
             self.main_js = file.read()
 
@@ -31,26 +32,8 @@ class Base:
             html = file.read()
 
         style_css = self.style_css
-        chart_js = Template(self.chart_js).safe_substitute(
-            data=self.data, **self.__size, **self.__main_attributes
-        )
+        chart_js = Template(self.chart_js).safe_substitute(**self.__dict__)
         return Template(html).safe_substitute(style=style_css, code=chart_js)
-
-    @property
-    def width(self):
-        return self.__size["width"]
-
-    @width.setter
-    def width(self, value):
-        self.__size["width"] = value
-
-    @property
-    def height(self):
-        return self.__size["height"]
-
-    @height.setter
-    def height(self, value):
-        self.__size["height"] = value
 
     def _repr_html_(self):
         html = urllib_quote(self.get_html())
@@ -68,12 +51,12 @@ class Base:
             '"allowfullscreen" "webkitallowfullscreen" "mozallowfullscreen">'
             "</iframe>"
         ).format(
-            html=html, onload=onload, width=self.width + 50, height=self.height + 50
+            html=html, onload=onload, width=self.width+50, height=self.height+50
         )
         return iframe
 
 
-class Graph(Base):
+class ForceGraph(Base):
     def __init__(
         self,
         data,
@@ -83,50 +66,31 @@ class Graph(Base):
         tooltip="null",
         bounding_box=True,
         view_box=False,
+        force_link=100,
+        force_simulation=-50,
+        force_collision=30
     ):
-        super().__init__(data, width, height, "graph", view_box)
-        self.__attributes = {
-            "tooltip": tooltip,
-            "radio": radio,
-            "bounding_box": bool_js(bounding_box),
-        }
+        super().__init__(data, width, height, "force graph", view_box)
+        self.tooltip = tooltip
+        self.radio = radio
+        self.bounding_box = bool_js(bounding_box)
+        self.force_link = force_link
+        self.force_simulation = force_simulation
+        self.force_collision = force_collision
 
-    def get_html(self):
-        html = super().get_html()
-        return Template(html).safe_substitute(**self.__attributes)
 
-    @property
-    def radio(self):
-        return self.__attributes["radio"]
-
-    @radio.setter
-    def radio(self, value):
-        self.__attributes["radio"] = value
-
+    
 
 class ArcDiagram(Base):
     def __init__(self, data, width, height, radio=20, tooltip="null", view_box=False):
         super().__init__(data, width, height, "arc diagram", view_box)
-        self.__attributes = {"tooltip": tooltip, "radio": radio}
+        self.tooltip = tooltip
+        self.radio = radio
 
-    def get_html(self):
-        html = super().get_html()
-        return Template(html).safe_substitute(**self.__attributes)
-
-    @property
-    def radio(self):
-        return self.__attributes["radio"]
-
-    @radio.setter
-    def radio(self, value):
-        self.__attributes["radio"] = value
-
+  
 
 class AdjacencyMatrix(Base):
     def __init__(self, data, size, tooltip="null", view_box=False):
         super().__init__(data, size, size, "adjacency matrix", view_box)
-        self.__attributes = {"tooltip": tooltip}
+        self.tooltip = tooltip
 
-    def get_html(self):
-        html = super().get_html()
-        return Template(html).safe_substitute(**self.__attributes)

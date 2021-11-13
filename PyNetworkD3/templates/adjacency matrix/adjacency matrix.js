@@ -1,69 +1,57 @@
 $main
 
-const tooltip = d3
-    .select("body")
-    .append("div")
-    .attr("class", "tooltip")
-    .style("opacity", 0);
+let idToNode = {};
+let matrix = {}
+let max_len_words = 0
 
-
-var graph = dataset;
-
-var idToNode = {};
-var connections = {};
-var matrix = {}
-let max_len_words = 5
-
-graph.nodes.forEach(n => {
+dataset.nodes.forEach(n => {
     idToNode[n.id] = n;
     matrix[n.id] = {}
-    graph.nodes.forEach((n2, j) => {
+    dataset.nodes.forEach((n2, j) => {
         matrix[n.id][n2.id] = 0
     })
     max_len_words = Math.max(max_len_words, String(n.id).length)
 });
 
-graph.links.forEach((e) => {
+dataset.links.forEach((e) => {
     matrix[e.source][e.target] = 1
     e.source = idToNode[e.source];
     e.target = idToNode[e.target];
 });
 
-var x = d3.scaleBand()
+let x = d3.scaleBand()
+    .domain(d3.range(dataset.nodes.length))
     .rangeRound([0, widthSVG])
     .paddingInner(0.1)
+    .round(false)
     .align(0);
 
-x.domain(d3.range(graph.nodes.length));
 
-var row = container.selectAll('g.row')
+let row = container.selectAll('g.row')
     .data(Object.values(matrix))
     .enter().append('g')
     .attr('class', 'row')
     .attr('transform', function(d, i) { return `translate(0, ${x(i)})`; })
 
-
-// alert(x.bandwidth()/10)
 row.append('text')
     .attr('class', 'label')
     .attr('x', -4)
     .attr('y', x.bandwidth() / 2)
     .attr('dy', '0.32em')
     .style('font-size', `${x.bandwidth()}px`)
-    .text((_, i) => graph.nodes[i].id);
+    .text((_, i) => dataset.nodes[i].id);
 
 let maxSize = 0
 document.querySelectorAll(".label").forEach(d => {
     maxSize = Math.max(d.getBBox().width, maxSize);
 })
 
-x.rangeRound([0, widthSVG - maxSize])
+x.rangeRound([0, widthSVG - maxSize]).round(false);
 
+container.selectAll('g.row').attr('transform', (_, i) => `translate(${maxSize}, ${x(i) + maxSize})`).each(makeRow);
+container.selectAll('text.label').attr('y', x.bandwidth() / 2).style('font-size', `${x.bandwidth()}px`)
 
-container.selectAll('g.row')
-    .attr('transform', function(d, i) { return `translate(${maxSize}, ${x(i) + maxSize})`; }).each(makeRow);
-
-var column = container.selectAll('g.column')
+column = container.selectAll('g.column')
     .data(Object.values(matrix))
     .enter().append('g')
     .attr('class', 'column')
@@ -74,7 +62,7 @@ var column = container.selectAll('g.column')
     .attr('y', x.bandwidth() / 2)
     .attr('dy', '0.32em')
     .style('font-size', `${x.bandwidth()}px`)
-    .text((_, i) => graph.nodes[i].id);
+    .text((_, i) => dataset.nodes[i].id);
 
 function makeRow(rowData) {
     d3.select(this).selectAll('rect')

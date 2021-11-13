@@ -1,6 +1,9 @@
 $main
 
-const bounding_box = $bounding_box;
+const boundingBox = $bounding_box;
+const forceLink = $force_link;
+const forceSimulation = $force_simulation;
+const forceCollision = $force_collision;
 const MAX_RADIUS = $radio;
 
 const tooltip = d3
@@ -12,12 +15,12 @@ const tooltip = d3
 const simulation = d3
     .forceSimulation()
     .force("center", d3.forceCenter(widthSVG / 2, heightSVG / 2))
-    .force("collision", d3.forceCollide(30))
-    .force("charge", d3.forceManyBody().strength(-50))
+    .force("collision", d3.forceCollide(forceCollision))
+    .force("charge", d3.forceManyBody().strength(forceSimulation))
     .force("link", d3.forceLink().id(node => node.id));
 
 const ticked = () => {
-    if (bounding_box) {
+    if (boundingBox) {
         container
             .selectAll(".node")
             .attr("cx", function(d) { return (d.x = Math.max(MAX_RADIUS, Math.min(widthSVG - MAX_RADIUS, d.x))); })
@@ -40,7 +43,7 @@ simulation
     .on("tick", ticked)
     .force("link")
     .links(dataset.links)
-    .distance(50);
+    .distance(forceLink);
 
 container
     .selectAll("line")
