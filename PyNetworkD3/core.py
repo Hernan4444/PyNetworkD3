@@ -13,7 +13,7 @@ class Base:
         self.data = data
         self.__size = {"width": width, "height": height}
         self.__main_attributes = {"view_box": bool_js(view_box)}
-        with open(join(TEMPLATE_PATH, f"main.js"), encoding="utf-8") as file:
+        with open(join(TEMPLATE_PATH, "main.js"), encoding="utf-8") as file:
             self.main_js = file.read()
 
         with open(join(TEMPLATE_PATH, chart, f"{chart}.js"), encoding="utf-8") as file:
