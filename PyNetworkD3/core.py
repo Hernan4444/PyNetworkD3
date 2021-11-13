@@ -51,7 +51,7 @@ class Base:
             '"allowfullscreen" "webkitallowfullscreen" "mozallowfullscreen">'
             "</iframe>"
         ).format(
-            html=html, onload=onload, width=self.width+50, height=self.height+50
+            html=html, onload=onload, width=self.width + 50, height=self.height + 50
         )
         return iframe
 
@@ -68,7 +68,7 @@ class ForceGraph(Base):
         view_box=False,
         force_link=100,
         force_simulation=-50,
-        force_collision=30
+        force_collision=30,
     ):
         super().__init__(data, width, height, "force graph", view_box)
         self.tooltip = tooltip
@@ -79,18 +79,14 @@ class ForceGraph(Base):
         self.force_collision = force_collision
 
 
-    
-
 class ArcDiagram(Base):
     def __init__(self, data, width, height, radio=20, tooltip="null", view_box=False):
         super().__init__(data, width, height, "arc diagram", view_box)
         self.tooltip = tooltip
         self.radio = radio
 
-  
 
 class AdjacencyMatrix(Base):
     def __init__(self, data, size, tooltip="null", view_box=False):
         super().__init__(data, size, size, "adjacency matrix", view_box)
         self.tooltip = tooltip
-
