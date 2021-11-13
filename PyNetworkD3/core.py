@@ -5,14 +5,19 @@ from string import Template
 from urllib.parse import quote as urllib_quote
 
 from .constants import TEMPLATE_PATH
+from .utils import bool_js
 
 
 class Base:
-    def __init__(self, data, width, height, chart):
+    def __init__(self, data, width, height, chart, view_box):
         self.data = data
         self.__size = {"width": width, "height": height}
+        self.__main_attributes = {"view_box": bool_js(view_box)}
+        with open(join(TEMPLATE_PATH, f"main.js"), encoding="utf-8") as file:
+            self.main_js = file.read()
+
         with open(join(TEMPLATE_PATH, chart, f"{chart}.js"), encoding="utf-8") as file:
-            self.chart_js = file.read()
+            self.chart_js = Template(file.read()).safe_substitute(main=self.main_js)
 
         with open(join(TEMPLATE_PATH, chart, f"{chart}.css"), encoding="utf-8") as file:
             self.style_css = "<style>\n{}\n</style>".format(file.read())
@@ -27,7 +32,7 @@ class Base:
 
         style_css = self.style_css
         chart_js = Template(self.chart_js).safe_substitute(
-            data=self.data, **self.__size
+            data=self.data, **self.__size, **self.__main_attributes
         )
         return Template(html).safe_substitute(style=style_css, code=chart_js)
 
@@ -69,9 +74,22 @@ class Base:
 
 
 class Graph(Base):
-    def __init__(self, data, width, height, radio=20, tooltip="null"):
-        super().__init__(data, width, height, "graph")
-        self.__attributes = {"tooltip": tooltip, "radio": radio}
+    def __init__(
+        self,
+        data,
+        width,
+        height,
+        radio=20,
+        tooltip="null",
+        bounding_box=True,
+        view_box=False,
+    ):
+        super().__init__(data, width, height, "graph", view_box)
+        self.__attributes = {
+            "tooltip": tooltip,
+            "radio": radio,
+            "bounding_box": bool_js(bounding_box),
+        }
 
     def get_html(self):
         html = super().get_html()
@@ -87,8 +105,8 @@ class Graph(Base):
 
 
 class ArcDiagram(Base):
-    def __init__(self, data, width, height, radio=20, tooltip="null"):
-        super().__init__(data, width, height, "arc diagram")
+    def __init__(self, data, width, height, radio=20, tooltip="null", view_box=False):
+        super().__init__(data, width, height, "arc diagram", view_box)
         self.__attributes = {"tooltip": tooltip, "radio": radio}
 
     def get_html(self):
@@ -102,3 +120,13 @@ class ArcDiagram(Base):
     @radio.setter
     def radio(self, value):
         self.__attributes["radio"] = value
+
+
+class AdjacencyMatrix(Base):
+    def __init__(self, data, size, tooltip="null", view_box=False):
+        super().__init__(data, size, size, "adjacency matrix", view_box)
+        self.__attributes = {"tooltip": tooltip}
+
+    def get_html(self):
+        html = super().get_html()
+        return Template(html).safe_substitute(**self.__attributes)

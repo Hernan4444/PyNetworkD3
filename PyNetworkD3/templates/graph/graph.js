@@ -1,24 +1,7 @@
-const borders = true;
-const WIDTH = $width;
-const HEIGHT = $height;
-const dataset = $data
-const tooltipAttributes = $tooltip
+$main
+
+const bounding_box = $bounding_box;
 const MAX_RADIUS = $radio;
-
-const MARGIN = { TOP: 10, BOTTOM: 10, LEFT: 10, RIGHT: 10 };
-const widthSVG = WIDTH - MARGIN.RIGHT - MARGIN.LEFT;
-const heightSVG = HEIGHT - MARGIN.TOP - MARGIN.BOTTOM;
-
-const SVG = d3.select('#pynetworkd3-chart')
-    .append('svg')
-    .attr('width', WIDTH)
-    .attr('height', HEIGHT)
-
-
-const container = SVG.append("g").attr(
-    "transform",
-    `translate(${MARGIN.LEFT}, ${MARGIN.TOP})`
-);
 
 const tooltip = d3
     .select("body")
@@ -34,11 +17,11 @@ const simulation = d3
     .force("link", d3.forceLink().id(node => node.id));
 
 const ticked = () => {
-    if (borders) {
+    if (bounding_box) {
         container
             .selectAll(".node")
-            .attr("cx", function (d) { return (d.x = Math.max(MAX_RADIUS, Math.min(widthSVG - MAX_RADIUS, d.x))); })
-            .attr("cy", function (d) { return (d.y = Math.max(MAX_RADIUS, Math.min(heightSVG - MAX_RADIUS, d.y))); })
+            .attr("cx", function(d) { return (d.x = Math.max(MAX_RADIUS, Math.min(widthSVG - MAX_RADIUS, d.x))); })
+            .attr("cy", function(d) { return (d.y = Math.max(MAX_RADIUS, Math.min(heightSVG - MAX_RADIUS, d.y))); })
     }
     container
         .selectAll(".node")
@@ -57,7 +40,7 @@ simulation
     .on("tick", ticked)
     .force("link")
     .links(dataset.links)
-    .distance(80);
+    .distance(50);
 
 container
     .selectAll("line")
@@ -98,10 +81,10 @@ const nodes = container
     .attr("class", "node")
     .call(
         d3
-            .drag()
-            .on("start", dragstarted)
-            .on("drag", dragged)
-            .on("end", dragended)
+        .drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended)
     );
 
 const mouseover = (event, node) => {
