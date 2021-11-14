@@ -87,10 +87,9 @@ class ArcDiagram(Base):
 
 
 class RadialDiagram(Base):
-    def __init__(self, data, size, radio=20, tooltip="null", view_box=False):
+    def __init__(self, data, size, tooltip="null", view_box=False):
         super().__init__(data, size, size, "radial diagram", view_box)
         self.tooltip = tooltip
-        self.radio = radio
 
 
 class AdjacencyMatrix(Base):
