@@ -1,4 +1,5 @@
 $main
+let bidirrectional = $bidirrectional
 
 let idToNode = {};
 let matrix = {}
@@ -15,6 +16,9 @@ dataset.nodes.forEach(n => {
 
 dataset.links.forEach((e) => {
     matrix[e.source][e.target] = 1
+    if (bidirrectional) {
+        matrix[e.target][e.source] = 1
+    }
     e.source = idToNode[e.source];
     e.target = idToNode[e.target];
 });

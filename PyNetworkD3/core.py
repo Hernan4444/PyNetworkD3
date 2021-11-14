@@ -17,10 +17,10 @@ class Base:
         with open(join(TEMPLATE_PATH, "main.js"), encoding="utf-8") as file:
             self.main_js = file.read()
 
-        with open(join(TEMPLATE_PATH, chart, f"{chart}.js"), encoding="utf-8") as file:
+        with open(join(TEMPLATE_PATH, chart, "code.js"), encoding="utf-8") as file:
             self.chart_js = Template(file.read()).safe_substitute(main=self.main_js)
 
-        with open(join(TEMPLATE_PATH, chart, f"{chart}.css"), encoding="utf-8") as file:
+        with open(join(TEMPLATE_PATH, chart, "style.css"), encoding="utf-8") as file:
             self.style_css = "<style>\n{}\n</style>".format(file.read())
 
     def export(self, path):
@@ -86,7 +86,17 @@ class ArcDiagram(Base):
         self.radio = radio
 
 
+class RadialDiagram(Base):
+    def __init__(self, data, size, radio=20, tooltip="null", view_box=False):
+        super().__init__(data, size, size, "radial diagram", view_box)
+        self.tooltip = tooltip
+        self.radio = radio
+
+
 class AdjacencyMatrix(Base):
-    def __init__(self, data, size, tooltip="null", view_box=False):
+    def __init__(
+        self, data, size, tooltip="null", view_box=False, bidirrectional=False
+    ):
         super().__init__(data, size, size, "adjacency matrix", view_box)
         self.tooltip = tooltip
+        self.bidirrectional = bool_js(bidirrectional)
