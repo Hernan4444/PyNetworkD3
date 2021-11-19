@@ -9,10 +9,6 @@
 }
 
 rect {
-    stroke-width: 1;
+    stroke-width: 0.1;
     stroke: rgb(131, 131, 131);
-}
-
-rect:hover {
-    stroke: rgb(241, 2, 2);
 }

@@ -27,9 +27,6 @@ let idToNode = {};
 dataset.nodes.forEach(function(n, i) {
     idToNode[n.id] = n;
     actualAngle = angle(i);
-    if (actualAngle < 180) {
-        actualAngle -= dataset.nodes.length * 0.01
-    }
     n.angle = actualAngle
     let actualX = x(actualAngle)
     let actualY = y(actualAngle)
@@ -49,7 +46,7 @@ container
         return `translate(${d.x}, ${d.y}) rotate(${angle})`
     })
     .attr("text-anchor", d => d.angle < 180 ? "start" : "end")
-    .attr("alignment-baseline", "middle")
+    .attr("dominant-baseline", "central")
 
 container
     .data(dataset.links)

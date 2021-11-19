@@ -20,11 +20,12 @@ let links = container
     .attr('d', function(d) {
         start = x(idToNode[d.source].id) // X position of start node on the X axis
         end = x(idToNode[d.target].id) // X position of end node
-        return ['M', start, heightSVG - 30, // the arc starts at the coordinate x=start, y=heightSVG-30 (where the starting node is)
+        return ['M', start, heightSVG - MAX_RADIUS, // the arc starts at the coordinate x=start, y=heightSVG-30 (where the starting node is)
                 'A', // This means we're gonna build an elliptical arc
-                (start - end) / 2, ',', // Next 2 lines are the coordinates of the inflexion point. Height of this point is proportional with start - end distance
-                (start - end) / 2, 0, 0, ',',
-                start < end ? 1 : 0, end, ',', heightSVG - 30
+                (start - end) / 2, ',', // Radius in X
+                Math.min(Math.abs(start - end) / 2, heightSVG), // Radius in Y
+                0, 0, ',',
+                start < end ? 1 : 0, end, ',', heightSVG - MAX_RADIUS
             ] // We always want the arc on top. So if end is before start, putting 0 here turn the arc upside down.
             .join(' ');
     })
@@ -35,7 +36,7 @@ let nodes = container
     .enter()
     .append("circle")
     .attr("cx", function(d) { return (x(d.id)) })
-    .attr("cy", heightSVG - 30)
+    .attr("cy", heightSVG - MAX_RADIUS)
     .attr("r", MAX_RADIUS)
 
 nodes

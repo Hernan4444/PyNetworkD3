@@ -1,11 +1,9 @@
 """Core module for the package. It holds the main object to be used."""
 
-from os.path import join
 from string import Template
 from urllib.parse import quote as urllib_quote
 
-from .constants import TEMPLATE_PATH
-from .utils import bool_js
+from .utils import bool_js, read
 
 
 class Base:
@@ -14,23 +12,19 @@ class Base:
         self.width = width
         self.height = height
         self.view_box = bool_js(view_box)
-        with open(join(TEMPLATE_PATH, "main.js"), encoding="utf-8") as file:
-            self.main_js = file.read()
-
-        with open(join(TEMPLATE_PATH, chart, "code.js"), encoding="utf-8") as file:
-            self.chart_js = Template(file.read()).safe_substitute(main=self.main_js)
-
-        with open(join(TEMPLATE_PATH, chart, "style.css"), encoding="utf-8") as file:
-            self.style_css = "<style>\n{}\n</style>".format(file.read())
+        self.canvas = bool_js(False)
+        self.main_js = read("main.js")
+        self.chart_js = Template(read("code.js", chart)).safe_substitute(
+            main=self.main_js
+        )
+        self.style_css = f'<style>\n{read("style.css", chart)}\n</style>'
 
     def export(self, path):
         with open(path, "w", encoding="utf-8") as file:
             file.write(self.get_html())
 
     def get_html(self):
-        with open(join(TEMPLATE_PATH, "main.html"), encoding="utf-8") as file:
-            html = file.read()
-
+        html = read("main.html")
         style_css = self.style_css
         chart_js = Template(self.chart_js).safe_substitute(**self.__dict__)
         return Template(html).safe_substitute(style=style_css, code=chart_js)
@@ -45,13 +39,11 @@ class Base:
             "this.contentDocument.close();"
         )
         iframe = (
-            '<iframe src="about:blank" width="{width}" height="{height}"'
+            f'<iframe src="about:blank" width="{self.width + 50}" height="{self.height + 50}"'
             'style="border:none !important;" '
-            'data-html={html} onload="{onload}" '
+            f'data-html={html} onload="{onload}" '
             '"allowfullscreen" "webkitallowfullscreen" "mozallowfullscreen">'
             "</iframe>"
-        ).format(
-            html=html, onload=onload, width=self.width + 50, height=self.height + 50
         )
         return iframe
 
@@ -69,6 +61,7 @@ class ForceGraph(Base):
         force_link=100,
         force_simulation=-50,
         force_collision=30,
+        canvas=False,
     ):
         super().__init__(data, width, height, "force graph", view_box)
         self.tooltip = tooltip
@@ -77,10 +70,20 @@ class ForceGraph(Base):
         self.force_link = force_link
         self.force_simulation = force_simulation
         self.force_collision = force_collision
+        self.canvas = bool_js(canvas)
+
+    def get_html(self):
+        filename = "code-canvas.js" if self.canvas == bool_js(True) else "code-svg.js"
+        code = read(filename, "force graph")
+        html = super().get_html()
+        return Template(html).safe_substitute(code=code)
 
 
 class ArcDiagram(Base):
-    def __init__(self, data, width, height, radio=20, tooltip="null", view_box=False):
+    def __init__(self, data, width, height=None, radio=20, tooltip="null", view_box=False):
+        if height is None:
+            height = width/2
+
         super().__init__(data, width, height, "arc diagram", view_box)
         self.tooltip = tooltip
         self.radio = radio
