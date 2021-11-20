@@ -36,6 +36,42 @@ Install using `pip`!
 $ pip install pynetworkd3
 ```
 
+## Input JSON syntax
+
+```
+{
+    "nodes": [
+        {
+          "id": "id1",
+          "attribute 1": "value attribute 1",
+          "attribute 2": "value attribute 2",
+          (...)
+          "attribute N": "value attribute N",
+        },
+        {
+          "id": "id2",
+          "attribute 1": "value attribute 1",
+          "attribute 2": "value attribute 2",
+          (...)
+          "attribute N": "value attribute N",
+        },
+        (...)
+    ],
+    "links": [
+        {
+            "source": "id1",
+            "target": "id2",
+            "attribute 1": "value attribute 1",
+            "attribute 2": "value attribute 2",
+            (...)
+            "attribute N": "value attribute N",
+        },
+        (...)
+    ]
+}
+```
+
+
 ## Usage
 
 To use the library, import the `Graph` object directly and use the `export` method
