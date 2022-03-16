@@ -71,6 +71,10 @@ $ pip install pynetworkd3
 }
 ```
 
+- Every dictionary in "nodes" must have the _id_ key. The other keys are optionals.
+
+- Every dictionary in "links" must have the _source_ and _target_ key. The other keys are optionals. Also, each id in source and target must redirect to an existing node in "nodes".
+
 
 ## Usage
 
@@ -97,7 +101,7 @@ graph = Graph(dataset, width=300, height=200, radio=10, tooltip=["id"])
 graph.export("output.html)
 ```
 
-Also you can write the instance in the last line of the notebook's cell (view the <a href="https://colab.research.google.com/drive/1AwtW-FDAaTh_RMBKj4CJYcyKP2xnOanK?usp=sharing"> example in colab</a>) to view the visualization.
+Also you can write the instance in the last line of the notebook's cell (ckeck the <a href="https://colab.research.google.com/drive/1AwtW-FDAaTh_RMBKj4CJYcyKP2xnOanK?usp=sharing"> example in colab</a>) to view the visualization.
 
 
 ## Developing
