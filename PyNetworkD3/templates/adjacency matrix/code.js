@@ -1,4 +1,11 @@
 $main
+const LINK_KWS = $link_kws;
+let COLOR_NODE = "#abd9e9";
+
+if (LINK_KWS.color_default) {
+    COLOR_NODE = LINK_KWS.color_default;
+}
+let color = GetColorFunction(LINK_KWS, dataset, COLOR_NODE);
 let bidirrectional = $bidirrectional
 
 let idToNode = {};
@@ -31,6 +38,7 @@ row.append('text')
     .attr('x', -4)
     .attr('y', x.bandwidth() / 2)
     .attr('dy', '0.32em')
+    .attr("id", d => `row-text-${d.index}`)
     .style('font-size', `${x.bandwidth()}px`)
     .text((_, i) => dataset.nodes[i].id);
 
@@ -45,6 +53,7 @@ container
     .selectAll('g.row')
     .attr('transform', (_, i) => `translate(${maxSize}, ${x(i) + maxSize})`)
     .append("rect")
+    .attr("id", d => `row-${d.index}`)
     .attr('height', x.bandwidth())
     .attr('width', widthSVG - maxSize)
     .style('fill', "transparent")
@@ -58,6 +67,7 @@ column = container.selectAll('g.column')
     .attr('transform', function(d, i) { return `translate(${x(i) + maxSize}, ${maxSize})`; })
 
 column.append("rect")
+    .attr("id", d => `column-${d.index}`)
     .attr('width', x.bandwidth())
     .attr('height', heightSVG - maxSize)
     .style('fill', "transparent")
@@ -70,9 +80,12 @@ column
     .attr('x', 4)
     .attr('y', x.bandwidth() / 2)
     .attr('dy', '0.32em')
+    .attr("id", d => `column-text-${d.index}`)
     .style('font-size', `${x.bandwidth()}px`)
     .text((_, i) => dataset.nodes[i].id);
 
+let rowColumns = container.selectAll("rect");
+let labels = container.selectAll("text");
 
 let links = container.selectAll('g.cell')
     .data(dataset.links)
@@ -85,7 +98,7 @@ links
     .attr('y', (d) => x(d.source.index) + maxSize)
     .attr('width', x.bandwidth())
     .attr('height', x.bandwidth())
-    .style('fill', "red")
+    .style('fill', color)
 
 if (bidirrectional) {
     links
@@ -94,6 +107,22 @@ if (bidirrectional) {
         .attr('x', (d) => x(d.source.index) + maxSize)
         .attr('width', x.bandwidth())
         .attr('height', x.bandwidth())
-        .style('fill', "red")
+        .style('fill', color)
 
+}
+
+if (LINK_KWS.hover) {
+    let linksRect = links.selectAll("rect");
+    linksRect.on('mouseover', function(event, d) {
+            d3.select(`#row-${d.source.index}`).style("fill", LINK_KWS.hover_rect_color);
+            d3.select(`#column-${d.target.index}`).style("fill", LINK_KWS.hover_rect_color);
+            d3.select(`#row-text-${d.source.index}`).style("fill", LINK_KWS.hover_text_color);
+            d3.select(`#column-text-${d.target.index}`).style("fill", LINK_KWS.hover_text_color);
+            ShowTooltip(d, event, LINK_KWS);
+        })
+        .on('mouseout', function(_, _) {
+            rowColumns.style("fill", "transparent");
+            labels.style("fill", "black");
+            HideTooltip(LINK_KWS);
+        })
 }

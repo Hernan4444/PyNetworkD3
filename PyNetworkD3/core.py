@@ -2,13 +2,17 @@
 
 from string import Template
 from urllib.parse import quote as urllib_quote
+import warnings
+import copy
+import zipfile
 
-from .utils import bool_js, read
+from .utils import bool_js, read, replace_dict
+from .kws import NodeCircleKws, LegendHoverKws, LinkLineKws, LinkRectKws
 
 
 class Base:
     def __init__(self, data, width, height, chart, view_box):
-        self.data = data
+        self.tooltip = None
         self.width = width
         self.height = height
         self.view_box = bool_js(view_box)
@@ -17,17 +21,40 @@ class Base:
         self.chart_js = Template(read("code.js", chart)).safe_substitute(
             main=self.main_js
         )
-        self.style_css = f'<style>\n{read("style.css", chart)}\n</style>'
+        self.style = read("style.css", chart)
+        self.aux_functions = ""
+        self.dataset = replace_dict(copy.deepcopy(data), None, "null")
+        self.aux_functions_name = []
 
     def export(self, path):
         with open(path, "w", encoding="utf-8") as file:
             file.write(self.get_html())
 
+    def export_multiples_file(self, path):
+        html = read("export_main.html")
+        self.aux_functions = ""
+        js = Template(self.chart_js).safe_substitute(**self.__dict__).replace("None", "null")
+        js = Template(js).safe_substitute(data=self.dataset)
+        self.load_aux_functions()
+        with zipfile.ZipFile(path + ".zip", 'w') as z:
+            z.writestr('main.html', html)
+            z.writestr('main.js', js)
+            z.writestr('utils.js', self.aux_functions)
+            z.writestr('style.css', self.style)
+
+    def load_aux_functions(self):
+        aux_functions = []
+        for name in self.aux_functions_name:
+            aux_functions.append(read(name + " function.js", "js utils"))
+        self.aux_functions = "\n\n".join(aux_functions)
+
     def get_html(self):
         html = read("main.html")
-        style_css = self.style_css
-        chart_js = Template(self.chart_js).safe_substitute(**self.__dict__)
-        return Template(html).safe_substitute(style=style_css, code=chart_js)
+        style = f'<style>\n{self.style}\n</style>'
+        self.load_aux_functions()
+        js = Template(self.chart_js).safe_substitute(**self.__dict__).replace("None", "null")
+        template = Template(html).safe_substitute(style=style, code=js)
+        return Template(template).safe_substitute(data=self.dataset)
 
     def _repr_html_(self):
         html = urllib_quote(self.get_html())
@@ -55,7 +82,7 @@ class ForceGraph(Base):
         width,
         height,
         radio=20,
-        tooltip="null",
+        tooltip=None,
         bounding_box=True,
         view_box=False,
         force_link=100,
@@ -64,7 +91,10 @@ class ForceGraph(Base):
         canvas=False,
     ):
         super().__init__(data, width, height, "force graph", view_box)
-        self.tooltip = tooltip
+        if canvas and tooltip is not None:
+            warnings.warn("Tooltip not available in canvas mode", stacklevel=2)
+
+        self.tooltip = None if tooltip is None else tooltip
         self.radio = radio
         self.bounding_box = bool_js(bounding_box)
         self.force_link = force_link
@@ -80,25 +110,30 @@ class ForceGraph(Base):
 
 
 class ArcDiagram(Base):
-    def __init__(self, data, width, height=None, radio=20, tooltip="null", view_box=False):
+    def __init__(self, data, width, height=None, view_box=False,
+                 node_kws={}, link_kws={}, legend_kws={}):
         if height is None:
-            height = width/2
+            height = width / 2
 
         super().__init__(data, width, height, "arc diagram", view_box)
-        self.tooltip = tooltip
-        self.radio = radio
+        self.node_kws = NodeCircleKws(node_kws, self.dataset)
+        self.legend_kws = LegendHoverKws(legend_kws)
+        self.link_kws = LinkLineKws(link_kws, self.dataset)
+        self.aux_functions_name = ["color", "size"]
 
 
 class RadialDiagram(Base):
-    def __init__(self, data, size, tooltip="null", view_box=False):
+    def __init__(self, data, size, tooltip=None, view_box=False):
         super().__init__(data, size, size, "radial diagram", view_box)
         self.tooltip = tooltip
 
 
 class AdjacencyMatrix(Base):
     def __init__(
-        self, data, size, tooltip="null", view_box=False, bidirrectional=False
+        self, data, size, view_box=False,
+        bidirrectional=False, link_kws={}
     ):
         super().__init__(data, size, size, "adjacency matrix", view_box)
-        self.tooltip = tooltip
         self.bidirrectional = bool_js(bidirrectional)
+        self.link_kws = LinkRectKws(link_kws, self.dataset)
+        self.aux_functions_name = ["color"]

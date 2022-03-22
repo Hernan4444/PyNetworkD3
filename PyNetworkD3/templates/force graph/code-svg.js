@@ -53,8 +53,20 @@ const mouseover = (event, node) => {
 
         tooltip
             .html(content)
-            .style("left", event.pageX + "px")
-            .style("top", event.pageY - 28 + "px");
+
+        let tooltipWidth = tooltip.node().offsetWidth;
+        let tooltipHeight = tooltip.node().offsetHeight;
+        let posX = event.pageX;
+        let posY = event.pageY - (tooltipAttributes.length * 29);
+        if (posX + tooltipWidth > widthSVG) {
+            posX -= tooltipWidth
+        };
+        if (posY - tooltipHeight < 0) {
+            posY = event.pageY + 5
+        };
+        tooltip
+            .style("left", posX + "px")
+            .style("top", posY + "px");
     }
 };
 
