@@ -1,13 +1,13 @@
 """Core module for the package. It holds the main object to be used."""
 
+import copy
+import warnings
+import zipfile
 from string import Template
 from urllib.parse import quote as urllib_quote
-import warnings
-import copy
-import zipfile
 
+from .kws import LegendHoverKws, LinkLineKws, LinkRectKws, NodeCircleKws
 from .utils import bool_js, read, replace_dict
-from .kws import NodeCircleKws, LegendHoverKws, LinkLineKws, LinkRectKws
 
 
 class Base:
@@ -33,14 +33,18 @@ class Base:
     def export_multiples_file(self, path):
         html = read("export_main.html")
         self.aux_functions = ""
-        js = Template(self.chart_js).safe_substitute(**self.__dict__).replace("None", "null")
+        js = (
+            Template(self.chart_js)
+            .safe_substitute(**self.__dict__)
+            .replace("None", "null")
+        )
         js = Template(js).safe_substitute(data=self.dataset)
         self.load_aux_functions()
-        with zipfile.ZipFile(path + ".zip", 'w') as z:
-            z.writestr('main.html', html)
-            z.writestr('main.js', js)
-            z.writestr('utils.js', self.aux_functions)
-            z.writestr('style.css', self.style)
+        with zipfile.ZipFile(path + ".zip", "w") as z:
+            z.writestr("main.html", html)
+            z.writestr("main.js", js)
+            z.writestr("utils.js", self.aux_functions)
+            z.writestr("style.css", self.style)
 
     def load_aux_functions(self):
         aux_functions = []
@@ -50,9 +54,13 @@ class Base:
 
     def get_html(self):
         html = read("main.html")
-        style = f'<style>\n{self.style}\n</style>'
+        style = f"<style>\n{self.style}\n</style>"
         self.load_aux_functions()
-        js = Template(self.chart_js).safe_substitute(**self.__dict__).replace("None", "null")
+        js = (
+            Template(self.chart_js)
+            .safe_substitute(**self.__dict__)
+            .replace("None", "null")
+        )
         template = Template(html).safe_substitute(style=style, code=js)
         return Template(template).safe_substitute(data=self.dataset)
 
@@ -110,8 +118,16 @@ class ForceGraph(Base):
 
 
 class ArcDiagram(Base):
-    def __init__(self, data, width, height=None, view_box=False,
-                 node_kws={}, link_kws={}, legend_kws={}):
+    def __init__(
+        self,
+        data,
+        width,
+        height=None,
+        view_box=False,
+        node_kws={},
+        link_kws={},
+        legend_kws={},
+    ):
         if height is None:
             height = width / 2
 
@@ -129,10 +145,7 @@ class RadialDiagram(Base):
 
 
 class AdjacencyMatrix(Base):
-    def __init__(
-        self, data, size, view_box=False,
-        bidirrectional=False, link_kws={}
-    ):
+    def __init__(self, data, size, view_box=False, bidirrectional=False, link_kws={}):
         super().__init__(data, size, size, "adjacency matrix", view_box)
         self.bidirrectional = bool_js(bidirrectional)
         self.link_kws = LinkRectKws(link_kws, self.dataset)
