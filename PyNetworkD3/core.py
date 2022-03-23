@@ -145,8 +145,8 @@ class RadialDiagram(Base):
 
 
 class AdjacencyMatrix(Base):
-    def __init__(self, data, size, view_box=False, bidirrectional=False, link_kws={}):
+    def __init__(self, data, size, view_box=False, bidirectional=False, link_kws={}):
         super().__init__(data, size, size, "adjacency matrix", view_box)
-        self.bidirrectional = bool_js(bidirrectional)
+        self.bidirectional = bool_js(bidirectional)
         self.link_kws = LinkRectKws(link_kws, self.dataset)
         self.aux_functions_name = ["color"]
